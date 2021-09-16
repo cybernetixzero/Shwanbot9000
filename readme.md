@@ -62,7 +62,8 @@ module.exports = {
         // Do all the code things that create a black hole.
         await interaction.reply('Hello I''m a black hole that is only slightly denser than Donald Trump.');
     }
-}```
+}
+```
 
 ## Contributions
 You are more than welcome to make any modifications you like but please share it with the server as it's an awesome learning exercise and it helps improve the bot over time.
