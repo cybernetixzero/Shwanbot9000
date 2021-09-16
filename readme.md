@@ -1,7 +1,7 @@
 # shwanbot9000
 *Written by CybernetixZero*
 
-I was inspired by discussion in #beep-boop to establish a Discord bot for any purpose on Artemis server. It caught me at a great time as I'm learning Node.js and this was a reasonable project to learn more about it and also adopt Discord.js.
+I was inspired by discussion in `#beep-boop` to establish a Discord bot for any purpose on Artemis server. It caught me at a great time as I'm learning Node.js and this was a reasonable project to learn more about it and also adopt Discord.js.
 
 ## Prerequisites
 You will need to install Node.js + npm. Docker is optional.
@@ -10,12 +10,13 @@ You will need to install Node.js + npm. Docker is optional.
 1. Unzip the archive containing the code into a folder (preferably ./shwanbot9000).
 2. Fire up your favourite terminal / command line.
 3. Navigate to the folder.
-4. Run "node install" *without quotes*
+4. Run `node install`
 
 ## Configuration
 The bot requires a config.json file located in the ./data directory. The redacted properties will be shared within #beep-boop.
 
-`{
+```json
+{
     "token": "<REDACTED>",
     "clientId": "<REDACTED>",
     "guildId": "<REDACTED>",
@@ -26,12 +27,13 @@ The bot requires a config.json file located in the ./data directory. The redacte
     "sentenceUnitOfTime": "Weeks",
     "hornyJailRoleId": "848255708481978449",
     "hornyJailRoleName": "hORNY-jAIL"
-}`
+}
+```
 
 ## Running (Terminal)
 1. Fire up your favourite terminal / command line.
 2. Navigate to the folder.
-3. Run "node ." *without quotes*
+3. Run `node .`
 
 ## Running (Docker)
 **TODO: Write Docker instructions.**
@@ -41,25 +43,31 @@ Taking inspiration from the Discord.js guide, I created a structure that makes i
 Commands are enumerated during app boot up, any changes will require the app to restart.
 All commands are implemented in separate *.js files located in the ./commands directory.
 
-`const { SlashCommandBuilder } = require('@discordjs/builders');
+```js
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const helpers = require('../helpers.js');
 
-const name = 'createblackhole'; // The command name that will be typed in Discord.
+// The command name that will be typed in Discord.
+const name = 'createblackhole';
 
 module.exports = {
-    name: name, // Passes in the command name const from above.
-    slashCommand: new SlashCommandBuilder() // Create a new SlashCommandBuilder object that tells Discord how to represent the command.
-        .setName(name) // Passes in the command name const from above.
-        .setDescription('Grab onto something, this will create a black hole.'),
-    execute: async function(interaction, config, client, rest) { // Commands get instances of interaction, config, client and rest objects from index.js.
+    // 'name': Pass in the command name const.
+    name: name, 
+    // 'slashCommand': Takes a SlashCommandBuilder object that tells Discord how to interpret the command.
+    slashCommand: new SlashCommandBuilder()
+        .setName(name) // Pass in the command name const.
+        .setDescription('Grab onto something, this will create a black hole.'), // Specify a description for the command.
+    // 'execute': The event handler in index.js will call this when your command gets invoked. It will pass in instances of interaction, config, client and rest objects.
+    execute: async function(interaction, config, client, rest) {
         // Do all the code things that create a black hole.
         await interaction.reply('Hello I''m a black hole that is only slightly denser than Donald Trump.');
     }
-}`
+}```
 
 ## Contributions
 You are more than welcome to make any modifications you like but please share it with the server as it's an awesome learning exercise and it helps improve the bot over time.
-**TODO Add GitHub details**
+
+Feel free to `git clone` and submit pull requests on https://github.com/cybernetixzero/Shwanbot9000.
 
 ## Resources
 - https://discord.js.org/#/docs/main/stable/general/welcome
