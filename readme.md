@@ -10,7 +10,7 @@ You will need to install Node.js + npm. Docker is optional.
 1. Unzip the archive containing the code into a folder (preferably ./shwanbot9000).
 2. Fire up your favourite terminal / command line.
 3. Navigate to the folder.
-4. Run `node install`
+4. Run `npm install`
 
 ## Configuration
 The bot requires a config.json file located in the ./data directory. The redacted properties will be shared within #beep-boop.
