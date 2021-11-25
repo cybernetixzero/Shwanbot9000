@@ -5,6 +5,8 @@ const { Routes } = require('discord-api-types/v9');
 const helpers = require('./helpers.js');
 const config = require('./data/config.json');
 
+const hornyJailService = require('./services/hornyjailservice.js');
+
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
     partials: ['MESSAGE', 'CHANNEL', 'REACTION']
@@ -14,7 +16,6 @@ const rest = new REST({ version: '9' })
     .setToken(config.token);
 
 const commands = helpers.getCommands();
-
 const slashCommandsJson = commands.map(command => command.slashCommand.toJSON());
 
 // Event handler for when it's ready.
@@ -25,7 +26,10 @@ client.once('ready', async () => {
     client.user.setStatus("online");
 
     // Register commands with the server. (Temporary)
-    await registerCommandsWithGuildOnDiscord();
+    await registerCommands();
+
+    // Start the Horny Jail service background task.
+    hornyJailService.startBackgroundTask();
 });
 
 // Event handler for when a command is invoked.
@@ -79,14 +83,14 @@ client.login(config.token);
 // Register commands with the Discord server.
 // This will be deprecated once the commands have been firmed up.
 // They will be replaced with global commands. [https://discordjs.guide/interactions/registering-slash-commands.html#global-commands]
-async function registerCommandsWithGuildOnDiscord() {
+async function registerCommands() {
     if (config.clientId === null) {
-        console.log('(registerCommandsWithGuildOnDiscord) ClientId is null.');
+        console.log('(registerCommands) ClientId is null.');
         return;
     }
 
     if (config.guildId === null) {
-        console.log('(registerCommandsWithGuildOnDiscord) GuildId is null.');
+        console.log('(registerCommands) GuildId is null.');
         return;
     }
 
@@ -94,6 +98,6 @@ async function registerCommandsWithGuildOnDiscord() {
         await rest.put(Routes.applicationGuildCommands(config.clientId, config.guildId), { body: slashCommandsJson });
     }
     catch (error) {
-        console.log(`(registerCommandsWithGuildOnDiscord) ApplicationGuildCommands REST call failed: ${error}`);
+        console.log(`(registerCommands) ApplicationGuildCommands REST call failed: ${error}`);
     }
 }
