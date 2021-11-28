@@ -1,14 +1,20 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const helpers = require('../helpers.js');
 
-const name = 'shout';
+class ShoutCommand {
+    constructor(configService, client, rest) {
+        this.configService = configService;
+        this.client = client;
+        this.rest = rest;
 
-module.exports = {
-    name: name,
-    slashCommand: new SlashCommandBuilder()
-        .setName(name)
-        .setDescription('You know what it does.'),
-    execute: async function(interaction, config, client, rest) {
-        await interaction.reply('SHAWN');
+        this.name = 'shout';
+        this.slashCommand = new SlashCommandBuilder()
+            .setName(this.name)
+            .setDescription('You know what it does.');
+    }
+
+    execute = async (interaction) => {
+        await interaction.reply('SHAWN!!!');
     }
 }
+
+module.exports = ShoutCommand;

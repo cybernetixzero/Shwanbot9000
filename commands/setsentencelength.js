@@ -1,29 +1,34 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const helpers = require('../helpers.js');
 
-const name = 'setsentencelength';
+class SetSentenceLengthCommand {
+    constructor(configService, client, rest) {
+        this.configService = configService;
+        this.client = client;
+        this.rest = rest;
 
-module.exports = {
-    name: name,
-    slashCommand: new SlashCommandBuilder()
-        .setName(name)
-        .setDescription('Sets the sentence length.')
-        .addIntegerOption(option =>
-            option.setName('value')
-                .setDescription('Enter the sentence length accrued for each bonk (relative to unit of time).')
-                .setRequired(true)),
-    execute: async function(interaction, config, client, rest) {
+        this.name = 'setsentencelength';
+        this.slashCommand = new SlashCommandBuilder()
+            .setName(this.name)
+            .setDescription('Sets the sentence length.')
+            .addIntegerOption(option =>
+                option.setName('value')
+                    .setDescription('Enter the sentence length accrued for each bonk (relative to unit of time).')
+                    .setRequired(true));
+    }
+
+    execute = async (interaction) => {
         const value = interaction.options.getInteger('value');
 
         if (value < 0) {
-            await interaction.reply('Sentence Length must be a positive number.');
+            await interaction.reply('Sentence length must be a positive number.');
             return;
         }
 
-        config.sentenceLength = value;
+        this.configService.json.sentenceLength = value;
+        this.configService.save();
 
-        helpers.saveConfigToDisk(config);
-
-        await interaction.reply(`Sentence Length has been set to ${value}`);
+        await interaction.reply(`Sentence length has been set to ${value}`);
     }
 }
+
+module.exports = SetSentenceLengthCommand;

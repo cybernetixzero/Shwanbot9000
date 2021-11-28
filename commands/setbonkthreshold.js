@@ -1,29 +1,34 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const helpers = require('../helpers.js');
 
-const name = 'setbonkthreshold';
+class SetBonkThresholdCommand {
+    constructor(configService, client, rest) {
+        this.configService = configService;
+        this.client = client;
+        this.rest = rest;
 
-module.exports = {
-    name: name,
-    slashCommand: new SlashCommandBuilder()
-        .setName(name)
-        .setDescription('Sets the bonk threshold.')
-        .addIntegerOption(option =>
-            option.setName('value')
-                .setDescription('Enter the number of bonks required to be sentenced.')
-                .setRequired(true)),
-    execute: async function(interaction, config, client, rest) {
+        this.name = 'setbonkthreshold';
+        this.slashCommand = new SlashCommandBuilder()
+            .setName(this.name)
+            .setDescription('Sets the bonk threshold.')
+            .addIntegerOption(option =>
+                option.setName('value')
+                    .setDescription('Enter the number of bonks required to be sentenced.')
+                    .setRequired(true));
+    }
+
+    execute = async (interaction) => {
         const value = interaction.options.getInteger('value');
 
         if (value < 0) {
-            await interaction.reply('Bonk Threshold must be a positive number.');
+            await interaction.reply('Bonk threshold must be a positive number.');
             return;
         }
 
-        config.bonkThreshold = value;
+        this.configService.json.bonkThreshold = value;
+        this.configService.save();
 
-        helpers.saveConfigToDisk(config);
-
-        await interaction.reply(`Bonk Threshold has been set to ${value}`);
+        await interaction.reply(`Bonk threshold has been set to ${value}`);
     }
 }
+
+module.exports = SetBonkThresholdCommand;

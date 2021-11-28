@@ -1,24 +1,26 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const helpers = require('../helpers.js');
 
-const name = 'setbonkemoji';
+class SetBonkEmojiCommand {
+    constructor(configService, client, rest) {
+        this.configService = configService;
+        this.client = client;
+        this.rest = rest;
 
-module.exports = {
-    name: name,
-    slashCommand: new SlashCommandBuilder()
-        .setName(name)
-        .setDescription('Sets the bonk emoji.')
-        .addStringOption(option =>
-            option.setName('emoji')
-                .setDescription('Enter the emoji that represents \"bonk\".')
-                .setRequired(true)),
-    execute: async function(interaction, config, client, rest) {
+        this.name = 'setbonkemoji';
+        this.slashCommand = new SlashCommandBuilder()
+            .setName(this.name)
+            .setDescription('Sets the bonk emoji.')
+            .addStringOption(option =>
+                option.setName('emoji')
+                    .setDescription('Enter the emoji that represents \"bonk\".')
+                    .setRequired(true));
+    }
+
+    execute = async (interaction) => {
         const emoji = interaction.options.getString('emoji');
 
-        console.log(emoji);
-
         if (emoji === null || emoji === '') {
-            await interaction.reply('Bonk Emoji cannot be blank.');
+            await interaction.reply('Bonk emoji cannot be blank.');
             return;
         }
 
@@ -27,18 +29,17 @@ module.exports = {
         const pattern = '<(a?:\\w{1,}:)(\\d{1,})>';
         const match = emoji.match(pattern);
         
-        console.log(match);
-
         if (match === null) {
-            await interaction.reply('Bonk Emoji was not recognised.');
+            await interaction.reply('Bonk emoji was not recognised.');
             return;
         }
         
-        config.bonkEmojiName = match[1];
-        config.bonkEmojiId = match[2];
+        this.configService.json.bonkEmojiName = match[1];
+        this.configService.json.bonkEmojiId = match[2];
+        this.configService.save();
 
-        helpers.saveConfigToDisk(config);
-
-        await interaction.reply(`Bonk Emoji has been set to ${emoji}`);
+        await interaction.reply(`Bonk emoji has been set to ${emoji}`);
     }
 }
+
+module.exports = SetBonkEmojiCommand;

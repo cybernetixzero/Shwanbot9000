@@ -1,22 +1,22 @@
-const { Client, Intents, Collection } = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { Client, Intents } = require('discord.js');
 const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
-const helpers = require('./helpers.js');
-const config = require('./data/config.json');
 
-const hornyJailService = require('./services/hornyjailservice.js');
+const ConfigService = require('./services/configservice.js');
+const CommandService = require('./services/commandsservice.js');
+const HornyJailService = require('./services/hornyjailservice.js');
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
     partials: ['MESSAGE', 'CHANNEL', 'REACTION']
 });
 
-const rest = new REST({ version: '9' })
-    .setToken(config.token);
+const configService = new ConfigService();
 
-const commands = helpers.getCommands();
-const slashCommandsJson = commands.map(command => command.slashCommand.toJSON());
+const rest = new REST({ version: '9' })
+    .setToken(configService.json.token);
+
+const commandService = new CommandService(configService, client, rest);
+const hornyJailService = new HornyJailService(configService, client, rest);
 
 // Event handler for when it's ready.
 client.once('ready', async () => {
@@ -25,34 +25,21 @@ client.once('ready', async () => {
     // Set bot to online.
     client.user.setStatus("online");
 
-    // Register commands with the server. (Temporary)
-    await registerCommands();
+    // Register commands with the server.
+    await commandService.registerCommands();
 
-    // Start the Horny Jail service background task.
-    hornyJailService.startBackgroundTask();
+    // Start the Horny Jail service task;
+    hornyJailService.startTask();
 });
 
 // Event handler for when a command is invoked.
 client.on('interactionCreate', async (interaction) => {
+    // Check if the interaction is a command.
     if (!interaction.isCommand())
         return;
 
-    // Fetch the command by name from the array.
-    const command = commands.get(interaction.commandName);
-
-    // Make sure it's a recognised command.
-    if (command === null) {
-        console.log(`(interactionCreate) Unknown command ${interaction.commandName}`);
-        return;
-    }
-    
-    try {
-        await command.execute(interaction, config, client, rest);
-    }
-    catch (error) {
-        console.error(error);
-        await interaction.reply({ content: 'There was an error while executing this command.', ephemeral: true });
-    }
+    // Call the command service to perform the command.
+    await commandService.performCommand(interaction);
 });
 
 // Event handler for when a reaction is added.
@@ -68,36 +55,18 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }
     }
 
-    console.log('(messageReactionAdd)');
-    console.log(reaction);
+    console.log('(reactionAdded)');
+
+    // Call the horny jail service to tell it a reaction has been added.
+    hornyJailService.reactionAdded(reaction, user);
 });
 
 // Event handler for when a reaction is removed.
 client.on('messageReactionRemove', async (reaction, user) => {
-    console.log('(messageReactionRemove)');
-    console.log(reaction);
+    console.log('(reactionRemoved)');
+
+    // Call the horny jail service to tell it a reaction has been removed.
+    hornyJailService.reactionRemoved(reaction, user);
 });
 
-client.login(config.token);
-
-// Register commands with the Discord server.
-// This will be deprecated once the commands have been firmed up.
-// They will be replaced with global commands. [https://discordjs.guide/interactions/registering-slash-commands.html#global-commands]
-async function registerCommands() {
-    if (config.clientId === null) {
-        console.log('(registerCommands) ClientId is null.');
-        return;
-    }
-
-    if (config.guildId === null) {
-        console.log('(registerCommands) GuildId is null.');
-        return;
-    }
-
-    try {
-        await rest.put(Routes.applicationGuildCommands(config.clientId, config.guildId), { body: slashCommandsJson });
-    }
-    catch (error) {
-        console.log(`(registerCommands) ApplicationGuildCommands REST call failed: ${error}`);
-    }
-}
+client.login(configService.json.token);
