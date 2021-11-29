@@ -2,6 +2,7 @@ const { Client, Intents } = require('discord.js');
 const { REST } = require('@discordjs/rest');
 
 const ConfigService = require('./services/configservice.js');
+const DatabaseService = require('./services/databaseservice.js');
 const CommandService = require('./services/commandsservice.js');
 const HornyJailService = require('./services/hornyjailservice.js');
 
@@ -15,13 +16,16 @@ const configService = new ConfigService();
 const rest = new REST({ version: '9' })
     .setToken(configService.json.token);
 
+const databaseService = new DatabaseService();
 const commandService = new CommandService(configService, client, rest);
-const hornyJailService = new HornyJailService(configService, client, rest);
+const hornyJailService = new HornyJailService(configService, databaseService);
 
 // Event handler for when it's ready.
 client.once('ready', async () => {
     console.log('(ready)');
 
+    await databaseService.bindTables();
+    
     // Set bot to online.
     client.user.setStatus("online");
 
@@ -29,7 +33,7 @@ client.once('ready', async () => {
     await commandService.registerCommands();
 
     // Start the Horny Jail service task;
-    hornyJailService.startTask();
+    //hornyJailService.startTask();
 });
 
 // Event handler for when a command is invoked.
@@ -55,18 +59,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }
     }
 
-    console.log('(reactionAdded)');
-
     // Call the horny jail service to tell it a reaction has been added.
-    hornyJailService.reactionAdded(reaction, user);
+    hornyJailService.reactionAdded(reaction);
 });
 
 // Event handler for when a reaction is removed.
 client.on('messageReactionRemove', async (reaction, user) => {
-    console.log('(reactionRemoved)');
-
     // Call the horny jail service to tell it a reaction has been removed.
-    hornyJailService.reactionRemoved(reaction, user);
+    hornyJailService.reactionRemoved(reaction);
 });
 
 client.login(configService.json.token);
