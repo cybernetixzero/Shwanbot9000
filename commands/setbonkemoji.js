@@ -24,18 +24,27 @@ class SetBonkEmojiCommand {
             return;
         }
 
-        // Parse <:bonk:875363537374031892>
-        // Parse <a:sadparrot:785328806504300585>
-        const pattern = '<(a?:\\w{1,}:)(\\d{1,})>';
-        const match = emoji.match(pattern);
-        
-        if (match === null) {
-            await interaction.reply('Bonk emoji was not recognised.');
-            return;
+        if (emoji.length > 0 && emoji.length <= 2) {
+            this.configService.json.bonkEmojiName = emoji;
+            this.configService.json.bonkEmojiId = null;
+            this.configService.json.isBonkEmojiCustom = false;
         }
-        
-        this.configService.json.bonkEmojiName = match[1];
-        this.configService.json.bonkEmojiId = match[2];
+        else if (emoji.length > 2) {
+            // Parse <:bonk:875363537374031892>
+            // Parse <a:sadparrot:785328806504300585>
+            const pattern = '<a?:(\\w{1,}):(\\d{1,})>';
+            const match = emoji.match(pattern);
+            
+            if (match === null) {
+                await interaction.reply('Bonk emoji was not recognised.');
+                return;
+            }
+            
+            this.configService.json.bonkEmojiName = match[1];
+            this.configService.json.bonkEmojiId = match[2];
+            this.configService.json.isBonkEmojiCustom = true;
+        }
+
         this.configService.save();
 
         await interaction.reply(`Bonk emoji has been set to ${emoji}`);

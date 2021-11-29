@@ -13,13 +13,21 @@ class ShowConfigCommand {
     }
 
     execute = async (interaction) => {
-        let bonkEmojiValue = (this.configService.json.bonkEmojiId === null || this.configService.json.bonkEmojiName === null) ? '[Not set]' : `<${this.configService.json.bonkEmojiName}${this.configService.json.bonkEmojiId}>`;
-        let bonkThresholdValue = (this.configService.json.bonkThreshold === null) ? '[Not set]' : this.configService.json.bonkThreshold.toString();
-        let sentenceLengthValue = (this.configService.json.sentenceLength === null) ? '[Not set]' : this.configService.json.sentenceLength.toString();
-        let sentenceUnitOfTimeValue = (this.configService.json.sentenceUnitOfTime === null) ? '[Not set]' : this.configService.json.sentenceUnitOfTime;
-        let hornyJailRoleValue = (this.configService.json.hornyJailRoleName === null) ? '[Not set]' : this.configService.json.hornyJailRoleName;
+        let bonkEmojiValue = '[Not set]';
+        if (this.configService.json.bonkEmojiName !== null) {
+            if (this.configService.json.isBonkEmojiCustom)
+                bonkEmojiValue = `<:${this.configService.json.bonkEmojiName}:${this.configService.json.bonkEmojiId}>`;
+            else
+                bonkEmojiValue = this.configService.json.bonkEmojiName;
+        }
 
-        let reply = `Bonk Emoji: ${bonkEmojiValue}\nBonk Threshold: ${bonkThresholdValue}\nSentence Length: ${sentenceLengthValue}\nSentence Unit of Time: ${sentenceUnitOfTimeValue}\nHorny Jail Role: ${hornyJailRoleValue}`;
+        const bonkThresholdValue = (this.configService.json.bonkThreshold === null) ? '[Not set]' : this.configService.json.bonkThreshold.toString();
+        const sentenceLengthValue = (this.configService.json.sentenceLength === null) ? '[Not set]' : this.configService.json.sentenceLength.toString();
+        const sentenceUnitOfTimeValue = (this.configService.json.sentenceUnitOfTime === null) ? '[Not set]' : this.configService.json.sentenceUnitOfTime;
+        const hornyJailRoleValue = (this.configService.json.hornyJailRoleName === null) ? '[Not set]' : this.configService.json.hornyJailRoleName;
+
+        const reply = `Bonk Emoji: ${bonkEmojiValue}\nBonk Threshold: ${bonkThresholdValue}\nSentence Length: ${sentenceLengthValue}\nSentence Unit of Time: ${sentenceUnitOfTimeValue}\nHorny Jail Role: ${hornyJailRoleValue}`;
+        
         await interaction.reply(reply);
     }
 }
