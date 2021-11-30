@@ -20,6 +20,7 @@ The bot requires a config.json file located in the ./data directory. The redacte
     "token": "<REDACTED>",
     "clientId": "<REDACTED>",
     "guildId": "<REDACTED>",
+    "isBonkEmojiCustom": true,
     "bonkEmojiId": "875363537374031892",
     "bonkEmojiName": ":bonk:",
     "bonkThreshold": 2,
@@ -45,24 +46,28 @@ All commands are implemented in separate *.js files located in the ./commands di
 
 ```js
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const helpers = require('../helpers.js');
 
-// The command name that will be typed in Discord.
-const name = 'createblackhole';
+class CreateBlackHoleCommand {
+    constructor(configService, client, rest) {
+        this.configService = configService;
+        this.client = client;
+        this.rest = rest;
 
-module.exports = {
-    // 'name': Pass in the command name const.
-    name: name, 
-    // 'slashCommand': Takes a SlashCommandBuilder object that tells Discord how to interpret the command.
-    slashCommand: new SlashCommandBuilder()
-        .setName(name) // Pass in the command name const.
-        .setDescription('Grab onto something, this will create a black hole.'), // Specify a description for the command.
-    // 'execute': The event handler in index.js will call this when your command gets invoked. It will pass in instances of interaction, config, client and rest objects.
-    execute: async function(interaction, config, client, rest) {
+        // The command name that will be typed in Discord.
+        this.name = 'createblackhole';
+        this.slashCommand = new SlashCommandBuilder()
+            .setName(this.name) // Pass in the command name property.
+            .setDescription('Grab onto something, this will create a black hole.'), // Specify a description for the command.
+    }
+
+    // execute(interaction): The event handler in index.js will call this when your command gets invoked. It will pass in an interaction instance that contains all the context about the command.
+    execute = async (interaction) => {
         // Do all the code things that create a black hole.
         await interaction.reply('Hello I''m a black hole that is only slightly denser than Donald Trump.');
     }
 }
+
+module.exports = CreateBlackHoleCommand;
 ```
 
 ## Contributions
