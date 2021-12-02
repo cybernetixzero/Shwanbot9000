@@ -22,7 +22,7 @@ class SetSentenceUnitOfTimeCommand {
     execute = async (interaction) => {
         const selection = interaction.options.getString('selection');
 
-        this.configService.json.sentenceUnitOfTime = selection;
+        this.configService.sentenceUnitOfTime = selection;
         this.configService.save();
 
         await interaction.reply(`Sentence unit of time has been set to ${selection}`);

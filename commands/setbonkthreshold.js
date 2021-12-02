@@ -24,7 +24,7 @@ class SetBonkThresholdCommand {
             return;
         }
 
-        this.configService.json.bonkThreshold = value;
+        this.configService.bonkThreshold = value;
         this.configService.save();
 
         await interaction.reply(`Bonk threshold has been set to ${value}`);

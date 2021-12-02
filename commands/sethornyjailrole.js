@@ -24,8 +24,8 @@ class SetHornyJailRoleCommand {
             return;
         }
 
-        this.configService.json.hornyJailRoleId = role.id;
-        this.configService.json.hornyJailRoleName = role.name;
+        this.configService.hornyJailRoleId = role.id;
+        this.configService.hornyJailRoleName = role.name;
         this.configService.save();
 
         await interaction.reply(`Horny jail role has been set to ${role.name}`);

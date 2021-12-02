@@ -25,9 +25,9 @@ class SetBonkEmojiCommand {
         }
 
         if (emoji.length > 0 && emoji.length <= 2) {
-            this.configService.json.bonkEmojiName = emoji;
-            this.configService.json.bonkEmojiId = null;
-            this.configService.json.isBonkEmojiCustom = false;
+            this.configService.bonkEmojiName = emoji;
+            this.configService.bonkEmojiId = null;
+            this.configService.isBonkEmojiCustom = false;
         }
         else if (emoji.length > 2) {
             // Parse <:bonk:875363537374031892>
@@ -40,9 +40,9 @@ class SetBonkEmojiCommand {
                 return;
             }
             
-            this.configService.json.bonkEmojiName = match[1];
-            this.configService.json.bonkEmojiId = match[2];
-            this.configService.json.isBonkEmojiCustom = true;
+            this.configService.bonkEmojiName = match[1];
+            this.configService.bonkEmojiId = match[2];
+            this.configService.isBonkEmojiCustom = true;
         }
 
         this.configService.save();

@@ -24,7 +24,7 @@ class SetSentenceLengthCommand {
             return;
         }
 
-        this.configService.json.sentenceLength = value;
+        this.configService.sentenceLength = value;
         this.configService.save();
 
         await interaction.reply(`Sentence length has been set to ${value}`);

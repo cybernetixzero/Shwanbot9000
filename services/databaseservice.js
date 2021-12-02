@@ -4,7 +4,8 @@ class DatabaseService {
     constructor() {
         this.database = new Sequelize({
             dialect: 'sqlite',
-            storage: './data/shwanbot9000.sqlite'
+            storage: './data/shwanbot9000.sqlite',
+            logging: false
         });
     }
 

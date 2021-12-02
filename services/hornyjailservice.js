@@ -5,7 +5,7 @@ class HornyJailService {
         
         this.hasStarted = false;
         this.handle = 0;
-        this.interval = 3000; // 3 Seconds.
+        this.interval = 60000; // 60 Seconds
     }
 
     startTask = () => {
@@ -27,9 +27,16 @@ class HornyJailService {
         console.log("(hornyJailService) runTask");
     }
 
-    reactionAdded = async (reaction) => {
+    setGuild = (guild) => {
+        this.guild = guild;
+    }
+
+    reactionChanged = async (reaction, action) => {
+        if (reaction === null)
+            return;
+
         // Check for the bonk emoji, bail if it's not.
-        if (reaction._emoji.name !== this.configService.json.bonkEmojiName)
+        if (reaction._emoji.name !== this.configService.bonkEmojiName)
             return;
 
         // Check if the author is a bot, bail if it is.
@@ -40,7 +47,8 @@ class HornyJailService {
         const userName = reaction.message.author.username;
 
         let sentence = await this.databaseService.getCurrentSentence(userId);
-        if (sentence === null) {
+
+        if (action === 'Added' && sentence === null) {
             sentence = {
                 id: 0,
                 userId: userId,
@@ -51,38 +59,39 @@ class HornyJailService {
                 isActive: false
             };
         }
-        
-        this.calculateSentence(sentence, 1);
+        else if (action === 'Removed' && sentence === null)
+            return;
 
-        if (sentence.id === 0)
+        const adjustment = (action === 'Added' ? 1 : (action == 'Removed' ? -1 : 0));
+
+        const isActiveBefore = sentence.isActive;
+
+        this.calculateSentence(sentence, adjustment);
+
+        const isActiveAfter = sentence.isActive;
+        const isActiveChanged = (isActiveBefore !== isActiveAfter);
+
+        if (action === 'Added' && sentence.id === 0)
             await this.databaseService.createSentenceFromEntity(sentence);
-        else
+        else if (sentence.id > 0)
             await this.databaseService.updateSentenceFromEntity(sentence);
 
-        console.log('Bonk Added!');
-    }
+        if (isActiveChanged) {
+            const role = await this.guild.roles.fetch(this.configService.hornyJailRoleId);
+            const member = await this.guild.members.fetch(userId);
+            
+            if (role !== null && member !== null) {
+                if (sentence.isActive)
+                    member.roles.add(role);
+                else
+                    member.roles.remove(role);
+            }
+        }
 
-    reactionRemoved = async (reaction) => {
-        // Check for the bonk emoji, bail if it's not.
-        if (reaction._emoji.name !== this.configService.json.bonkEmojiName)
-            return;
-
-        // Check if the author is a bot, bail if it is.
-        if (reaction.message.author.bot)
-            return;
-
-        const userId = reaction.message.author.id;
-        const userName = reaction.message.author.username;
-
-        let sentence = await this.databaseService.getCurrentSentence(userId);
-        if (sentence === null)
-            return;
-        
-        this.calculateSentence(sentence, -1);
-
-        await this.databaseService.updateSentenceFromEntity(sentence);
-
-        console.log('Bonk Removed!');
+        if (action === 'Added')
+            console.log(`Bonk added to ${userName}.`);
+        else if (action === 'Removed')
+            console.log(`Bonk removed to ${userName}.`);
     }
 
     calculateSentence = (sentence, adjustment) => {
@@ -98,22 +107,22 @@ class HornyJailService {
         }
 
         // Activate the sentence if bonks reaches the threshold.
-        if (sentence.bonks >= this.configService.json.bonkThreshold)
+        if (sentence.bonks >= this.configService.bonkThreshold)
             sentence.isActive = true;
         else
             sentence.isActive = false;
 
         // Calculate the sentence expiry.
         let days = 0;
-        switch (this.configService.json.sentenceUnitOfTime) {
+        switch (this.configService.sentenceUnitOfTime) {
             case 'Days':
-                days = this.configService.json.sentenceLength * sentence.bonks;
+                days = this.configService.sentenceLength * sentence.bonks;
                 break;
             case 'Weeks':
-                days = this.configService.json.sentenceLength * sentence.bonks * 7;
+                days = this.configService.sentenceLength * sentence.bonks * 7;
                 break;
             case 'Months':
-                days = this.configService.json.sentenceLength * sentence.bonks * 28;
+                days = this.configService.sentenceLength * sentence.bonks * 28;
                 break;
         }
         sentence.expiresAt = new Date(sentence.commencesAt.getTime());

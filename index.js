@@ -1,4 +1,15 @@
-const { Client, Intents } = require('discord.js');
+/*
+       .__                         ___.           __   _______________  _______  _______   
+  _____|  |____  _  _______    ____\_ |__   _____/  |_/   __   \   _  \ \   _  \ \   _  \  
+ /  ___/  |  \ \/ \/ /\__  \  /    \| __ \ /  _ \   __\____    /  /_\  \/  /_\  \/  /_\  \ 
+ \___ \|   Y  \     /  / __ \|   |  \ \_\ (  <_> )  |    /    /\  \_/   \  \_/   \  \_/   \
+/____  >___|  /\/\_/  (____  /___|  /___  /\____/|__|   /____/  \_____  /\_____  /\_____  /
+     \/     \/             \/     \/    \/                            \/       \/       \/ 
+
+    by CybernetixZero
+*/
+
+const { Client, Intents, ThreadChannel } = require('discord.js');
 const { REST } = require('@discordjs/rest');
 
 const ConfigService = require('./services/configservice.js');
@@ -8,13 +19,13 @@ const HornyJailService = require('./services/hornyjailservice.js');
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
-    partials: ['MESSAGE', 'CHANNEL', 'REACTION']
+    partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER']
 });
 
 const configService = new ConfigService();
 
 const rest = new REST({ version: '9' })
-    .setToken(configService.json.token);
+    .setToken(configService.token);
 
 const databaseService = new DatabaseService();
 const commandService = new CommandService(configService, client, rest);
@@ -25,15 +36,18 @@ client.once('ready', async () => {
     console.log('(ready)');
 
     await databaseService.bindTables();
-    
-    // Set bot to online.
-    client.user.setStatus("online");
 
     // Register commands with the server.
     await commandService.registerCommands();
 
-    // Start the Horny Jail service task;
-    //hornyJailService.startTask();
+    const guild = await client.guilds.fetch(configService.guildId);
+
+    // Initialise and run Horny Jail service.
+    hornyJailService.setGuild(guild);
+    hornyJailService.startTask();
+
+    // Set bot to online.
+    client.user.setStatus("online");
 });
 
 // Event handler for when a command is invoked.
@@ -60,13 +74,24 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 
     // Call the horny jail service to tell it a reaction has been added.
-    hornyJailService.reactionAdded(reaction);
+    await hornyJailService.reactionChanged(reaction, 'Added');
 });
 
 // Event handler for when a reaction is removed.
 client.on('messageReactionRemove', async (reaction, user) => {
+    // Check if it's a partial structure, if so then fetch it.
+    if (reaction.partial) {
+        try {
+            await reaction.fetch();
+        }
+        catch (error) {
+            console.log(`(messageReactionRemove) Couldn\'t fetch the message: ${error}`);
+            return;
+        }
+    }
+
     // Call the horny jail service to tell it a reaction has been removed.
-    hornyJailService.reactionRemoved(reaction);
+    await hornyJailService.reactionChanged(reaction, 'Removed');
 });
 
-client.login(configService.json.token);
+client.login(configService.token);

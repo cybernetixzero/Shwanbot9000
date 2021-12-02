@@ -14,17 +14,17 @@ class ShowConfigCommand {
 
     execute = async (interaction) => {
         let bonkEmojiValue = '[Not set]';
-        if (this.configService.json.bonkEmojiName !== null) {
-            if (this.configService.json.isBonkEmojiCustom)
-                bonkEmojiValue = `<:${this.configService.json.bonkEmojiName}:${this.configService.json.bonkEmojiId}>`;
+        if (this.configService.bonkEmojiName !== null) {
+            if (this.configService.isBonkEmojiCustom)
+                bonkEmojiValue = `<:${this.configService.bonkEmojiName}:${this.configService.bonkEmojiId}>`;
             else
-                bonkEmojiValue = this.configService.json.bonkEmojiName;
+                bonkEmojiValue = this.configService.bonkEmojiName;
         }
 
-        const bonkThresholdValue = (this.configService.json.bonkThreshold === null) ? '[Not set]' : this.configService.json.bonkThreshold.toString();
-        const sentenceLengthValue = (this.configService.json.sentenceLength === null) ? '[Not set]' : this.configService.json.sentenceLength.toString();
-        const sentenceUnitOfTimeValue = (this.configService.json.sentenceUnitOfTime === null) ? '[Not set]' : this.configService.json.sentenceUnitOfTime;
-        const hornyJailRoleValue = (this.configService.json.hornyJailRoleName === null) ? '[Not set]' : this.configService.json.hornyJailRoleName;
+        const bonkThresholdValue = (this.configService.bonkThreshold === null) ? '[Not set]' : this.configService.bonkThreshold.toString();
+        const sentenceLengthValue = (this.configService.sentenceLength === null) ? '[Not set]' : this.configService.sentenceLength.toString();
+        const sentenceUnitOfTimeValue = (this.configService.sentenceUnitOfTime === null) ? '[Not set]' : this.configService.sentenceUnitOfTime;
+        const hornyJailRoleValue = (this.configService.hornyJailRoleName === null) ? '[Not set]' : this.configService.hornyJailRoleName;
 
         const reply = `Bonk Emoji: ${bonkEmojiValue}\nBonk Threshold: ${bonkThresholdValue}\nSentence Length: ${sentenceLengthValue}\nSentence Unit of Time: ${sentenceUnitOfTimeValue}\nHorny Jail Role: ${hornyJailRoleValue}`;
         

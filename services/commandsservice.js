@@ -28,18 +28,18 @@ class CommandService {
     }
 
     registerCommands = async () => {
-        if (this.configService.json.clientId === null) {
+        if (this.configService.clientId === null) {
             console.log('(registerCommands) ClientId is null.');
             return;
         }
     
-        if (this.configService.json.guildId === null) {
+        if (this.configService.guildId === null) {
             console.log('(registerCommands) GuildId is null.');
             return;
         }
     
         try {
-            await this.rest.put(Routes.applicationGuildCommands(this.configService.json.clientId, this.configService.json.guildId), { body: this.slashCommandsJson });
+            await this.rest.put(Routes.applicationGuildCommands(this.configService.clientId, this.configService.guildId), { body: this.slashCommandsJson });
         }
         catch (error) {
             console.log(`(registerCommands) ApplicationGuildCommands REST call failed: ${error}`);
