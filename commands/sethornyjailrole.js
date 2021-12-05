@@ -1,10 +1,11 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 class SetHornyJailRoleCommand {
-    constructor(configService, client, rest) {
+    constructor(configService, databaseService, hornyJailService, client) {
         this.configService = configService;
+        this.databaseService = databaseService;
+        this.hornyJailService = hornyJailService;
         this.client = client;
-        this.rest = rest;
 
         this.name = 'sethornyjailrole';
         this.slashCommand = new SlashCommandBuilder()

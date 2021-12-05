@@ -27,8 +27,8 @@ const rest = new REST({ version: '9' })
     .setToken(configService.token);
 
 const databaseService = new DatabaseService();
-const commandService = new CommandService(configService, client, rest);
 const hornyJailService = new HornyJailService(configService, databaseService, client);
+const commandService = new CommandService(configService, databaseService, hornyJailService, client, rest);
 
 // Event handler for when it's ready.
 client.once('ready', async () => {

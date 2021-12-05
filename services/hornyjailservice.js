@@ -162,21 +162,29 @@ class HornyJailService {
     }
 
     generateActiveMessage = (sentence) => {
-        const dayPlural = (sentence.days == 1 ? 'day' : 'days');
+        const daysPlural = this.getDaysPlural(sentence.days);
 
         const messages = [
-            `Oooff! <@${sentence.userId}> just scored ${sentence.days} ${dayPlural} in hornitary confinement.`,
-            `Bonk me sideways! It looks like <@${sentence.userId}> can't keep their hand off it and scored themselves ${sentence.days} ${dayPlural} in the slammer.`,
-            `I sentence <@${sentence.userId}> to kiss my ass and ${sentence.days} ${dayPlural} in horny jail.`,
-            `<@${sentence.userId}> you're under arrest for excessive bonkage. You are sentenced to horny jail for ${sentence.days} ${dayPlural}.`,
-            `Bonk Alert! To prevent <@${sentence.userId}> from going blind they are being sentenced to horny jail for a period of ${sentence.days} ${dayPlural}.`,
-            `<@${sentence.userId}> is heading to the horny place to frolic with their kind for ${sentence.days} ${dayPlural}.`,
-            `It looks like <@${sentence.userId}> is going bonkers! You'll be safe in horny jail for ${sentence.days} ${dayPlural}.`,
-            `Oh my! *clutches pearls* <@${sentence.userId}> is way too horny. Off to the sin bin you go for ${sentence.days} ${dayPlural}.`
+            `Oooff! <@${sentence.userId}> just scored ${daysPlural} in hornitary confinement.`,
+            `Bonk me sideways! It looks like <@${sentence.userId}> can't keep their hand off it and scored themselves ${daysPlural} in the slammer.`,
+            `I sentence <@${sentence.userId}> to kiss my ass and ${daysPlural} in horny jail.`,
+            `<@${sentence.userId}> you're under arrest for excessive bonkage. You are sentenced to horny jail for ${daysPlural}.`,
+            `Bonk Alert! To prevent <@${sentence.userId}> from going blind they are being sentenced to horny jail for a period of ${daysPlural}.`,
+            `<@${sentence.userId}> is heading to the horny place to frolic with their kind for ${daysPlural}.`,
+            `It looks like <@${sentence.userId}> is going bonkers! You'll be safe in horny jail for ${daysPlural}.`,
+            `Oh my! *clutches pearls* <@${sentence.userId}> is way too horny. Off to the sin bin you go for ${daysPlural}.`
         ];
 
         const index = Math.floor(Math.random() * messages.length);
         return messages[index];
+    }
+
+    getDaysPlural = (days) => {
+        return `${days} ${days == 1 ? 'day' : 'days'}`;
+    }
+
+    getTimesPlural = (times) => {
+        return `${times} ${times == 1 ? 'time' : 'times'}`;
     }
 }
 

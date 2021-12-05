@@ -1,10 +1,11 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 class Magic8BallCommand {
-    constructor(configService, client, rest) {
+    constructor(configService, databaseService, hornyJailService, client) {
         this.configService = configService;
+        this.databaseService = databaseService;
+        this.hornyJailService = hornyJailService;
         this.client = client;
-        this.rest = rest;
 
         this.name = 'magic8ball';
         this.slashCommand = new SlashCommandBuilder()

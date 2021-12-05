@@ -2,10 +2,13 @@ const { Routes } = require('discord-api-types/v9');
 const fs = require('fs');
 
 class CommandService {
-    constructor(configService, client, rest) {
+    constructor(configService, databaseService, hornyJailService, client, rest) {
         this.configService = configService;
+        this.databaseService = databaseService;
+        this.hornyJailService = hornyJailService;
         this.client = client;
         this.rest = rest;
+
         this.bindCommands();
     }
 
@@ -19,7 +22,7 @@ class CommandService {
         for (const commandFile of commandFiles) {
             const commandClass = require(`../commands/${commandFile}`);
             if (commandClass !== null) {
-                const command = new commandClass(this.configService, this.client, this.rest);
+                const command = new commandClass(this.configService, this.databaseService, this.hornyJailService, this.client);
                 this.commands.push(command);
             }
         }
@@ -64,10 +67,11 @@ class CommandService {
 
         try {
             // Execute the command.
-            await command.execute(interaction, this.config, this.client, this.rest);
+            await command.execute(interaction);
         }
         catch (error) {
             console.error(error);
+
             await interaction.reply({ content: 'There was an error while executing this command.', ephemeral: true });
         }
     }
