@@ -1,11 +1,12 @@
 class HornyJailService {
-    constructor(configService, databaseService) {
+    constructor(configService, databaseService, client) {
         this.configService = configService;
         this.databaseService = databaseService;
+        this.client = client;
         
         this.hasStarted = false;
         this.handle = 0;
-        this.interval = 60000; // 60 Seconds
+        this.interval = 60000; // 60 seconds
     }
 
     startTask = () => {
@@ -23,8 +24,29 @@ class HornyJailService {
         this.handle = 0;
     }
 
-    runTask = () => {
-        console.log("(hornyJailService) runTask");
+    runTask = async () => {
+        const date = new Date();
+        
+        const role = await this.guild.roles.fetch(this.configService.hornyJailRoleId);
+        
+        const sentences = await this.databaseService.getActiveSentences();
+
+        for (let i = 0; i < sentences.length; i++) {
+            const sentence = sentences[i];
+
+            if (sentence.expiresAt <= date) {
+                sentence.isActive = false;
+                this.databaseService.updateSentenceFromEntity(sentence);
+
+                const member = await this.guild.members.fetch(sentence.userId);
+
+                if (role !== null && member !== null) {
+                    member.roles.remove(role);
+
+                    console.log(`${sentence.userName} has been removed from horny jail (sentence expired).`);
+                }
+            }
+        }
     }
 
     setGuild = (guild) => {
@@ -56,6 +78,7 @@ class HornyJailService {
                 bonks: 0,
                 commencesAt: new Date(),
                 expiresAt: new Date(),
+                days: 0,
                 isActive: false
             };
         }
@@ -81,17 +104,24 @@ class HornyJailService {
             const member = await this.guild.members.fetch(userId);
             
             if (role !== null && member !== null) {
-                if (sentence.isActive)
+                if (sentence.isActive) {
                     member.roles.add(role);
-                else
+
+                    console.log(`${sentence.userName} has been added to horny jail (>= bonk threshold).`);
+
+                    const channel = await this.client.channels.fetch(reaction.message.channelId);
+                    if (channel !== null) {
+                        const message = this.generateActiveMessage(sentence);
+                        channel.send(message);
+                    }
+                }
+                else {
                     member.roles.remove(role);
+
+                    console.log(`${sentence.userName} has been removed from horny jail (< bonk threshold).`);
+                }
             }
         }
-
-        if (action === 'Added')
-            console.log(`Bonk added to ${userName}.`);
-        else if (action === 'Removed')
-            console.log(`Bonk removed to ${userName}.`);
     }
 
     calculateSentence = (sentence, adjustment) => {
@@ -125,8 +155,28 @@ class HornyJailService {
                 days = this.configService.sentenceLength * sentence.bonks * 28;
                 break;
         }
+
+        sentence.days = days;
         sentence.expiresAt = new Date(sentence.commencesAt.getTime());
         sentence.expiresAt.setDate(sentence.expiresAt.getDate() + days);
+    }
+
+    generateActiveMessage = (sentence) => {
+        const dayPlural = (sentence.days == 1 ? 'day' : 'days');
+
+        const messages = [
+            `Oooff! <@${sentence.userId}> just scored ${sentence.days} ${dayPlural} in hornitary confinement.`,
+            `Bonk me sideways! It looks like <@${sentence.userId}> can't keep their hand off it and scored themselves ${sentence.days} ${dayPlural} in the slammer.`,
+            `I sentence <@${sentence.userId}> to kiss my ass and ${sentence.days} ${dayPlural} in horny jail.`,
+            `<@${sentence.userId}> you're under arrest for excessive bonkage. You are sentenced to horny jail for ${sentence.days} ${dayPlural}.`,
+            `Bonk Alert! To prevent <@${sentence.userId}> from going blind they are being sentenced to horny jail for a period of ${sentence.days} ${dayPlural}.`,
+            `<@${sentence.userId}> is heading to the horny place to frolic with their kind for ${sentence.days} ${dayPlural}.`,
+            `It looks like <@${sentence.userId}> is going bonkers! You'll be safe in horny jail for ${sentence.days} ${dayPlural}.`,
+            `Oh my! *clutches pearls* <@${sentence.userId}> is way too horny. Off to the sin bin you go for ${sentence.days} ${dayPlural}.`
+        ];
+
+        const index = Math.floor(Math.random() * messages.length);
+        return messages[index];
     }
 }
 

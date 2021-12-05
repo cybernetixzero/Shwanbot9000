@@ -5,11 +5,10 @@
  \___ \|   Y  \     /  / __ \|   |  \ \_\ (  <_> )  |    /    /\  \_/   \  \_/   \  \_/   \
 /____  >___|  /\/\_/  (____  /___|  /___  /\____/|__|   /____/  \_____  /\_____  /\_____  /
      \/     \/             \/     \/    \/                            \/       \/       \/ 
-
     by CybernetixZero
 */
 
-const { Client, Intents, ThreadChannel } = require('discord.js');
+const { Client, Intents } = require('discord.js');
 const { REST } = require('@discordjs/rest');
 
 const ConfigService = require('./services/configservice.js');
@@ -29,11 +28,11 @@ const rest = new REST({ version: '9' })
 
 const databaseService = new DatabaseService();
 const commandService = new CommandService(configService, client, rest);
-const hornyJailService = new HornyJailService(configService, databaseService);
+const hornyJailService = new HornyJailService(configService, databaseService, client);
 
 // Event handler for when it's ready.
 client.once('ready', async () => {
-    console.log('(ready)');
+    printLogo();
 
     await databaseService.bindTables();
 
@@ -48,6 +47,8 @@ client.once('ready', async () => {
 
     // Set bot to online.
     client.user.setStatus("online");
+
+    console.log('The bot is online and ready.');
 });
 
 // Event handler for when a command is invoked.
@@ -93,5 +94,10 @@ client.on('messageReactionRemove', async (reaction, user) => {
     // Call the horny jail service to tell it a reaction has been removed.
     await hornyJailService.reactionChanged(reaction, 'Removed');
 });
+
+printLogo = () => {
+    console.log('       .__                         ___.           __   _______________  _______  _______   \n  _____|  |____  _  _______    ____\\_ |__   _____/  |_/   __   \\   _  \\ \\   _  \\ \\   _  \\  \n /  ___/  |  \\ \\/ \\/ /\\__  \\  /    \\| __ \\ /  _ \\   __\\____    /  /_\\  \\/  /_\\  \\/  /_\\  \\ \n \\___ \\|   Y  \\     /  / __ \\|   |  \\ \\_\\ (  <_> )  |    /    /\\  \\_/   \\  \\_/   \\  \\_/   \\\n/____  >___|  /\\/\\_/  (____  /___|  /___  /\\____/|__|   /____/  \\_____  /\\_____  /\\_____  /\n     \\/     \\/             \\/     \\/    \\/                            \\/       \\/       \\/ ');
+    console.log('    by CybernetixZero\n');
+}
 
 client.login(configService.token);
