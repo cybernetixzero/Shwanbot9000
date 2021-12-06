@@ -1,0 +1,8 @@
+version: "3.9"
+services:
+  shwanbot9000:
+    build: .
+    image: shwanbot9000
+    container_name: shwanbot9000
+    volumes:
+      - ./data:/app/data

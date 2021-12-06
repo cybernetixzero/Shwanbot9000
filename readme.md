@@ -36,8 +36,29 @@ The bot requires a config.json file located in the ./data directory. The redacte
 2. Navigate to the folder.
 3. Run `node .`
 
+## Installing (Docker)
+1. Fire up your favourite terminal / command line on a system running Docker.
+2. Navigate to the folder where containers are kept.
+3. Run the following commands:
+```
+mkdir shwanbot9000
+cd shwanbot9000
+wget https://raw.githubusercontent.com/cybernetixzero/Shwanbot9000/main/Dockerfile
+wget https://raw.githubusercontent.com/cybernetixzero/Shwanbot9000/main/docker-compose.yml
+mkdir data
+cd data
+touch config.json
+cd ..
+```
+4. PM @CybernetixZero to get the latest config.json and replace in ./data folder.
+
 ## Running (Docker)
-**TODO: Write Docker instructions.**
+1. Fire up your favourite terminal / command line on a system running Docker.
+2. Navigate to the shwanbot9000 container folder.
+3. Run the following commands:
+```
+docker-compose up -d
+```
 
 ## Writing Commands
 Taking inspiration from the Discord.js guide, I created a structure that makes it straightforward to build and plug-in commands.
