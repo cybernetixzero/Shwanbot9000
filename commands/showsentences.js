@@ -18,11 +18,16 @@ class ShowSentencesCommand {
 
         const sentences = await this.databaseService.getActiveSentences();
 
-        let reply = '';
+        let reply = '```';
         if (sentences.length == 1)
             reply += 'There is currently 1 member in horny jail.\n\n';
         else
             reply += `There are currently ${sentences.length} members in horny jail.\n\n`;
+
+        reply += 'B: Bonks, D: Days, DL: Days Left\n\n';
+
+        reply += ' User                      | Days | Left \n';
+        reply += '-----------------------------------------\n';
 
         for (const sentence of sentences) {
             const timeDifference = (sentence.expiresAt.getTime() - date.getTime());
@@ -32,8 +37,12 @@ class ShowSentencesCommand {
             const releaseDaysPlural = this.hornyJailService.getDaysPlural(releaseDays);
             const bonksPlural = this.hornyJailService.getTimesPlural(sentence.bonks);
 
+            "".padEnd()
+
             reply += `<@${sentence.userId}> has been bonked ${bonksPlural} and is sentenced for ${sentenceDaysPlural}. Due for release in ${releaseDaysPlural}.`;
         }
+
+        reply += '```';
 
         await interaction.reply(reply);
     }

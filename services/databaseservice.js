@@ -88,6 +88,7 @@ class DatabaseService {
                     { isActive: { [Op.eq]: true } }
                 ]
             }
+            // Order by Days
         });
 
         return sentences;
