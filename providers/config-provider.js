@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-class ConfigService {
+class ConfigProvider {
     constructor() {
         this.load();
     }
@@ -18,4 +18,4 @@ class ConfigService {
     }
 }
 
-module.exports = ConfigService;
+module.exports = ConfigProvider;
