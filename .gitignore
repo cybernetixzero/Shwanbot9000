@@ -1,4 +1,2 @@
 /node_modules
-/data/config.json
-/data/config.json.bak
-/data/shwanbot9000.sqlite
+/dist
